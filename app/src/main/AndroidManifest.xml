@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.beraber.beraber" >
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name=".BeraberApp"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".activities.MainActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".activities.ExploreActivity_"
+            android:label="@string/title_activity_explore" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.ActivityDetailActivity_"
+            android:label="@string/title_activity_activity_detail"
+            android:parentActivityName=".activities.ExploreActivity_" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.beraber.beraber.activities.ExploreActivity_" />
+        </activity>
+        <activity
+            android:name=".activities.NewActivityActivity_"
+            android:label="@string/title_activity_new" >
+        </activity>
+    </application>
+
+</manifest>

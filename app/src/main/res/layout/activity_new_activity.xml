@@ -1,0 +1,76 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.beraber.beraber.activities.NewActivityActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primaryColor">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:theme="@style/FormToolbar"
+            />
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/form_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:hint="Activity Name"
+            android:textSize="24sp"
+            app:floatingLabel="highlight"
+            app:hideUnderline="false"
+            app:baseColor="#ffffff"
+            app:primaryColor="#ff5fc8cf"
+            app:errorColor="#ffdd4d78"
+            />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/form_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Description"
+                app:helperText="Tell about your activity..."
+                app:floatingLabel="highlight"
+                app:hideUnderline="false"
+                app:baseColor="#333"
+                app:primaryColor="#ff5fc8cf"
+                app:errorColor="#ffdd4d78"
+                app:maxCharacters="140"
+                />
+
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/form_startDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Start Date"
+                app:helperText="When your activity begins..."
+                app:floatingLabel="highlight"
+                app:hideUnderline="false"
+                app:baseColor="#333"
+                app:primaryColor="#ff5fc8cf"
+                app:errorColor="#ffdd4d78"
+                />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
