@@ -30,32 +30,44 @@ android {
         }
     }
 }
+sourceSets {
+    testLocal {
+        java.srcDir file('src/test/java')
+        resources.srcDir file('src/test/resources')
+    }
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     compile project(':androidbasestructer')
 
-    compile 'de.greenrobot:greendao:1.3.7'
-
+    // Dependency Injection Libs
     apt 'com.squareup.dagger:dagger-compiler:1.2.1'
     compile 'com.squareup.dagger:dagger:1.2.1'
 
     apt "org.androidannotations:androidannotations:3.2"
     compile "org.androidannotations:androidannotations-api:3.2"
 
+    compile 'com.jakewharton:butterknife:6.0.0'
+
+    // Support Libraries
     compile 'com.android.support:appcompat-v7:21.0.+'
     compile 'com.android.support:gridlayout-v7:21.0.+'
     compile 'com.android.support:recyclerview-v7:21.0.+'
     compile 'com.android.support:cardview-v7:21.0.+'
 
-    compile 'com.jakewharton:butterknife:6.0.0'
-    compile 'com.squareup.retrofit:retrofit:+'
+    // Data related libraries
+    compile 'de.greenrobot:greendao:1.3.7'
 
+    compile 'com.squareup.okhttp:okhttp:2.0.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
+    compile 'com.squareup.retrofit:retrofit:1.6.0'
+
+    // 3rd party widgets
     compile 'com.pnikosis:materialish-progress:1.2'
     compile 'com.afollestad:material-dialogs:0.4.6'
     compile 'de.hdodenhof:circleimageview:1.2.1'
-
     compile 'com.rengwuxian.materialedittext:library:1.7.1'
     compile 'com.malinskiy:materialicons:1.0.1'
     compile 'com.melnykov:floatingactionbutton:1.1.0'
@@ -76,3 +88,19 @@ apt {
         // logFile '/var/log/aa.log'
     }
 }
+
+task localTest(type: Test, dependsOn: assemble) {
+    testClassesDir = sourceSets.testLocal.output.classesDir
+
+    android.sourceSets.main.java.srcDirs.each { dir ->
+        def buildDir = dir.getAbsolutePath().split('/')
+        buildDir =  (buildDir[0..(buildDir.length - 4)] + ['build', 'classes', 'debug']).join('/')
+
+        sourceSets.testLocal.compileClasspath += files(buildDir)
+        sourceSets.testLocal.runtimeClasspath += files(buildDir)
+    }
+
+    classpath = sourceSets.testLocal.runtimeClasspath
+}
+
+check.dependsOn localTest

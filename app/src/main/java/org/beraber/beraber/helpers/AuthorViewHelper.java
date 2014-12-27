@@ -5,7 +5,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 
 import org.beraber.beraber.R;
-import org.beraber.beraber.entities.User;
+import org.beraber.beraber.daos.User;
 
 
 public class AuthorViewHelper {

@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 import org.beraber.beraber.R;
 import org.beraber.beraber.activities.ActivityDetailActivity;
 import org.beraber.beraber.activities.ActivityDetailActivity_;
-import org.beraber.beraber.entities.Activity;
-import org.beraber.beraber.entities.User;
+import org.beraber.beraber.daos.Activity;
+import org.beraber.beraber.daos.User;
 import org.beraber.beraber.helpers.ActivityViewHelper;
 import org.beraber.beraber.helpers.AuthorViewHelper;
 
@@ -58,21 +58,21 @@ public class ActivityCardAdapter extends RecyclerView.Adapter<ActivityCardViewHo
     public void onBindViewHolder(ActivityCardViewHolder holder, int position) {
         final Activity activity = activityList.get(position);
 
-        User user = activity.user;
+        User user = activity.getUser();
 
-        if (activity.user != null) {
+        if (user != null) {
             holder.authorAvatar.setImageDrawable(authorViewHelper.getAvatarDrawable(context, user));
-            holder.authorName.setText(user.name);
-            holder.authorBio.setText(user.bio);
+            holder.authorName.setText(user.getName());
+            holder.authorBio.setText(user.getBio());
         }
 
-        holder.activityTitle.setText(activity.title);
+        holder.activityTitle.setText(activity.getTitle());
 
-        if (activity.startDate != null) {
-            holder.activityDate.setText(activityViewHelper.formatDate(activity.startDate));
+        if (activity.getStart_date() != null) {
+            holder.activityDate.setText(activityViewHelper.formatDate(activity.getStart_date()));
         }
 
-        holder.activityDescription.setText(activity.description);
+        holder.activityDescription.setText(activity.getDescription());
         holder.activityImage.setImageDrawable(activityViewHelper.getImageDrawable(context, activity));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +85,7 @@ public class ActivityCardAdapter extends RecyclerView.Adapter<ActivityCardViewHo
 
     public void startDetailActivity(Activity activity) {
         Intent intent = new Intent(this.context, ActivityDetailActivity_.class);
-        intent.putExtra(ActivityDetailActivity.EXTRA_ACTIVITY_DATA, activity);
+        intent.putExtra(ActivityDetailActivity.EXTRA_ACTIVITY_ID, activity.getId());
         this.context.startActivity(intent);
     }
 

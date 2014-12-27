@@ -2,7 +2,6 @@ package org.beraber.beraber.activities;
 
 import android.app.DatePickerDialog;
 import android.graphics.Color;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
@@ -12,7 +11,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
@@ -22,8 +21,10 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
 import org.beraber.beraber.R;
-import org.beraber.beraber.entities.Activity;
-import org.beraber.beraber.entities.User;
+import org.beraber.beraber.daos.Activity;
+import org.beraber.beraber.daos.User;
+import org.beraber.beraber.repositories.ActivityRepository;
+import org.beraber.beraber.repositories.UserRepository;
 import org.beraber.beraber.services.ActivitiesApiService;
 
 import java.text.SimpleDateFormat;
@@ -34,6 +35,7 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import retrofit.RetrofitError;
 
 @EActivity
 public class NewActivityActivity extends BaseActivity
@@ -56,6 +58,12 @@ implements DatePickerDialog.OnDateSetListener
 
     @Inject
     ActivitiesApiService activitiesApiService;
+
+    @Inject
+    ActivityRepository activityRepository;
+
+    @Inject
+    UserRepository userRepository;
 
     DatePickerDialog datePicker;
     Date selectedDate;
@@ -90,21 +98,39 @@ implements DatePickerDialog.OnDateSetListener
     }
 
     public void createActivity() {
-        User user = new User("Umur Gedik", "hebelek", 1);
-        Activity activity = new Activity(title.getText().toString(), description.getText().toString(), user, 0, selectedDate, null, 0);
+        User user = new User(1l);
 
+        Activity activity = new Activity();
+        activity.setTitle(title.getText().toString());
+        activity.setDescription(description.getText().toString());
+        activity.setUser(user);
+        activity.setStart_date(selectedDate);
+
+        onActivitySaved();
         saveActivity(activity);
     }
 
     @Background
     void saveActivity(Activity activity) {
-        activitiesApiService.createActivity(activity);
+        try {
+            Activity newActivity = activitiesApiService.createActivity(activity);
+            User user = newActivity.getUser();
 
-        onActivitySaved();
+            userRepository.insertOrUpdate(user);
+            activityRepository.insertOrUpdate(newActivity);
+        } catch (RetrofitError e) {
+            onActivitySaveError();
+        }
+    }
+
+    @UiThread
+    void onActivitySaveError() {
+        Toast.makeText(getApplicationContext(), "Error when saving your activity", Toast.LENGTH_LONG).show();
     }
 
     @UiThread
     void onActivitySaved() {
+        Toast.makeText(getApplicationContext(), "Your activity has been saved!", Toast.LENGTH_SHORT).show();
         finish();
     }
 

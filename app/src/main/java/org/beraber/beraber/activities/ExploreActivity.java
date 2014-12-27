@@ -20,9 +20,10 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.beraber.beraber.R;
 import org.beraber.beraber.adapters.ActivityCardAdapter;
-import org.beraber.beraber.entities.Activity;
+import org.beraber.beraber.daos.Activity;
 import org.beraber.beraber.helpers.ActivityViewHelper;
 import org.beraber.beraber.helpers.AuthorViewHelper;
+import org.beraber.beraber.repositories.ActivityRepository;
 import org.beraber.beraber.services.ActivitiesApiService;
 
 import java.util.List;
@@ -50,6 +51,9 @@ public class ExploreActivity extends BaseActivity {
     ActivitiesApiService activitiesService;
 
     @Inject
+    ActivityRepository activityRepository;
+
+    @Inject
     AuthorViewHelper authorViewHelper;
 
     @Inject
@@ -67,6 +71,9 @@ public class ExploreActivity extends BaseActivity {
             setSupportActionBar(toolbar);
         }
 
+        activitiesList.setHasFixedSize(true);
+        activitiesList.setDrawingCacheEnabled(true);
+
         fab.setImageDrawable(new IconDrawable(this, Iconify.IconValue.md_add).sizeDp(24).color(Color.WHITE));
         fab.attachToRecyclerView(activitiesList);
 
@@ -75,7 +82,7 @@ public class ExploreActivity extends BaseActivity {
 
     private void openActivityDetailIntent(Activity activity) {
         Intent intent = new Intent(this, ActivityDetailActivity.class);
-        intent.putExtra(ActivityDetailActivity.EXTRA_ACTIVITY_DATA, activity);
+        intent.putExtra(ActivityDetailActivity.EXTRA_ACTIVITY_ID, activity.getId());
     }
 
     private void prepareActivities() {
@@ -96,7 +103,7 @@ public class ExploreActivity extends BaseActivity {
 
     @Background
     void fetchActivities() {
-        List<Activity> activities = activitiesService.listActivities();
+        List<Activity> activities = activityRepository.getAll();
         activitiesAdapter = new ActivityCardAdapter(
                 activities,
                 this,

@@ -1,6 +1,6 @@
 package org.beraber.beraber.services;
 
-import org.beraber.beraber.entities.User;
+import org.beraber.beraber.daos.User;
 
 import java.util.List;
 

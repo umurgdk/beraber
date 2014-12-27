@@ -20,9 +20,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -42,7 +39,7 @@ import retrofit.mime.TypedOutput;
  */
 public class RootedGsonConverter implements Converter {
     private final Gson gson;
-    private String charset;
+    private String encoding;
 
     /**
      * Create an instance using the supplied {@link Gson} object for conversion. Encoding to JSON and
@@ -54,17 +51,17 @@ public class RootedGsonConverter implements Converter {
 
     /**
      * Create an instance using the supplied {@link Gson} object for conversion. Encoding to JSON and
-     * decoding from JSON (when no charset is specified by a header) will use the specified charset.
+     * decoding from JSON (when no charset is specified by a header) will use the specified encoding.
      */
-    public RootedGsonConverter(Gson gson, String charset) {
+    public RootedGsonConverter(Gson gson, String encoding) {
         this.gson = gson;
-        this.charset = charset;
+        this.encoding = encoding;
     }
 
     @Override public Object fromBody(TypedInput body, Type type) throws ConversionException {
-        String charset = this.charset;
+        String charset = "UTF-8";
         if (body.mimeType() != null) {
-            charset = MimeUtil.parseCharset(body.mimeType(), charset);
+            charset = MimeUtil.parseCharset(body.mimeType());
         }
         InputStreamReader isr = null;
         try {
@@ -89,7 +86,7 @@ public class RootedGsonConverter implements Converter {
             JsonElement je = gson.toJsonTree(object);
             JsonObject jo = new JsonObject();
             jo.add(object.getClass().getSimpleName().toLowerCase(), je);
-            return new JsonTypedOutput(gson.toJson(jo).getBytes(charset), charset);
+            return new JsonTypedOutput(gson.toJson(jo).getBytes(encoding), encoding);
         } catch (UnsupportedEncodingException e) {
             throw new AssertionError(e);
         }
