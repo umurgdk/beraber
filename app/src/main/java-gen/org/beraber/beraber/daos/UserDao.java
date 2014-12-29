@@ -26,6 +26,7 @@ public class UserDao extends AbstractDao<User, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
         public final static Property Bio = new Property(2, String.class, "bio", false, "BIO");
+        public final static Property Server_id = new Property(3, Long.class, "server_id", false, "SERVER_ID");
     };
 
     private DaoSession daoSession;
@@ -46,7 +47,8 @@ public class UserDao extends AbstractDao<User, Long> {
         db.execSQL("CREATE TABLE " + constraint + "'USER' (" + //
                 "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'NAME' TEXT," + // 1: name
-                "'BIO' TEXT);"); // 2: bio
+                "'BIO' TEXT," + // 2: bio
+                "'SERVER_ID' INTEGER);"); // 3: server_id
     }
 
     /** Drops the underlying database table. */
@@ -74,6 +76,11 @@ public class UserDao extends AbstractDao<User, Long> {
         if (bio != null) {
             stmt.bindString(3, bio);
         }
+ 
+        Long server_id = entity.getServer_id();
+        if (server_id != null) {
+            stmt.bindLong(4, server_id);
+        }
     }
 
     @Override
@@ -94,7 +101,8 @@ public class UserDao extends AbstractDao<User, Long> {
         User entity = new User( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // bio
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // bio
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3) // server_id
         );
         return entity;
     }
@@ -105,6 +113,7 @@ public class UserDao extends AbstractDao<User, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setBio(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setServer_id(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
      }
     
     /** @inheritdoc */

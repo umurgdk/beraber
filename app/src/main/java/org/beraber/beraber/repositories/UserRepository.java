@@ -4,6 +4,7 @@ import org.beraber.beraber.daos.DaoSession;
 import org.beraber.beraber.daos.User;
 import org.beraber.beraber.daos.UserDao;
 
+import java.util.Collection;
 import java.util.List;
 
 public class UserRepository {
@@ -16,8 +17,8 @@ public class UserRepository {
         this.dao = this.session.getUserDao();
     }
 
-    public void insertOrUpdate(User user) {
-        dao.insertOrReplace(user);
+    public long insertOrUpdate(User user) {
+        return dao.insertOrReplace(user);
     }
 
     public void clear() {
@@ -34,5 +35,17 @@ public class UserRepository {
 
     public User getById(long id) {
         return dao.load(id);
+    }
+
+    public User getByServerId(long id) {
+        return dao.queryBuilder().where(UserDao.Properties.Server_id.eq(id)).unique();
+    }
+
+    public List<User> getUsersById(List<Long> ids) {
+        return dao.queryBuilder().where(UserDao.Properties.Id.in(ids)).list();
+    }
+
+    public List<User> getUsersByServerId(Collection<Long> ids) {
+        return dao.queryBuilder().where(UserDao.Properties.Server_id.in(ids)).list();
     }
 }

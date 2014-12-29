@@ -12,6 +12,7 @@ public class Activity {
     private Long id;
     private String title;
     private String description;
+    private Long server_id;
     private java.util.Date start_date;
     private long user_id;
 
@@ -32,10 +33,11 @@ public class Activity {
         this.id = id;
     }
 
-    public Activity(Long id, String title, String description, java.util.Date start_date, long user_id) {
+    public Activity(Long id, String title, String description, Long server_id, java.util.Date start_date, long user_id) {
         this.id = id;
         this.title = title;
         this.description = description;
+        this.server_id = server_id;
         this.start_date = start_date;
         this.user_id = user_id;
     }
@@ -68,6 +70,14 @@ public class Activity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getServer_id() {
+        return server_id;
+    }
+
+    public void setServer_id(Long server_id) {
+        this.server_id = server_id;
     }
 
     public java.util.Date getStart_date() {

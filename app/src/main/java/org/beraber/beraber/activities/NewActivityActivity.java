@@ -11,20 +11,17 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
+import com.path.android.jobqueue.JobManager;
 
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.SystemService;
-import org.androidannotations.annotations.UiThread;
 import org.beraber.beraber.R;
-import org.beraber.beraber.daos.Activity;
-import org.beraber.beraber.daos.User;
+import org.beraber.beraber.helpers.entities.ActivityEntityHelper;
+import org.beraber.beraber.jobs.CreateActivityJob;
 import org.beraber.beraber.repositories.ActivityRepository;
-import org.beraber.beraber.repositories.UserRepository;
 import org.beraber.beraber.services.ActivitiesApiService;
 
 import java.text.SimpleDateFormat;
@@ -35,7 +32,6 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import retrofit.RetrofitError;
 
 @EActivity
 public class NewActivityActivity extends BaseActivity
@@ -57,13 +53,16 @@ implements DatePickerDialog.OnDateSetListener
     InputMethodManager im;
 
     @Inject
-    ActivitiesApiService activitiesApiService;
+    JobManager jobManager;
 
     @Inject
     ActivityRepository activityRepository;
 
     @Inject
-    UserRepository userRepository;
+    ActivitiesApiService activitiesApiService;
+
+    @Inject
+    ActivityEntityHelper activityEntityHelper;
 
     DatePickerDialog datePicker;
     Date selectedDate;
@@ -98,39 +97,12 @@ implements DatePickerDialog.OnDateSetListener
     }
 
     public void createActivity() {
-        User user = new User(1l);
+        String title_ = title.getText().toString();
+        String description_ = description.getText().toString();
+        long user_id = 1;
+        Date start_date = selectedDate;
 
-        Activity activity = new Activity();
-        activity.setTitle(title.getText().toString());
-        activity.setDescription(description.getText().toString());
-        activity.setUser(user);
-        activity.setStart_date(selectedDate);
-
-        onActivitySaved();
-        saveActivity(activity);
-    }
-
-    @Background
-    void saveActivity(Activity activity) {
-        try {
-            Activity newActivity = activitiesApiService.createActivity(activity);
-            User user = newActivity.getUser();
-
-            userRepository.insertOrUpdate(user);
-            activityRepository.insertOrUpdate(newActivity);
-        } catch (RetrofitError e) {
-            onActivitySaveError();
-        }
-    }
-
-    @UiThread
-    void onActivitySaveError() {
-        Toast.makeText(getApplicationContext(), "Error when saving your activity", Toast.LENGTH_LONG).show();
-    }
-
-    @UiThread
-    void onActivitySaved() {
-        Toast.makeText(getApplicationContext(), "Your activity has been saved!", Toast.LENGTH_SHORT).show();
+        jobManager.addJobInBackground(new CreateActivityJob(title_, description_, user_id, start_date));
         finish();
     }
 

@@ -21,17 +21,20 @@ import org.androidannotations.annotations.UiThread;
 import org.beraber.beraber.R;
 import org.beraber.beraber.adapters.ActivityCardAdapter;
 import org.beraber.beraber.daos.Activity;
+import org.beraber.beraber.events.ActivityEntityEvents;
+import org.beraber.beraber.events.UserEntityEvents;
 import org.beraber.beraber.helpers.ActivityViewHelper;
 import org.beraber.beraber.helpers.AuthorViewHelper;
 import org.beraber.beraber.repositories.ActivityRepository;
-import org.beraber.beraber.services.ActivitiesApiService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import de.greenrobot.event.EventBus;
 
 @EActivity
 public class ExploreActivity extends BaseActivity {
@@ -46,9 +49,6 @@ public class ExploreActivity extends BaseActivity {
 
     @InjectView(R.id.fab)
     FloatingActionButton fab;
-
-    @Inject
-    ActivitiesApiService activitiesService;
 
     @Inject
     ActivityRepository activityRepository;
@@ -71,11 +71,10 @@ public class ExploreActivity extends BaseActivity {
             setSupportActionBar(toolbar);
         }
 
-        activitiesList.setHasFixedSize(true);
-        activitiesList.setDrawingCacheEnabled(true);
-
         fab.setImageDrawable(new IconDrawable(this, Iconify.IconValue.md_add).sizeDp(24).color(Color.WHITE));
         fab.attachToRecyclerView(activitiesList);
+
+        EventBus.getDefault().register(this);
 
         prepareActivities();
     }
@@ -86,6 +85,9 @@ public class ExploreActivity extends BaseActivity {
     }
 
     private void prepareActivities() {
+        activitiesAdapter = new ActivityCardAdapter(new ArrayList<Activity>(), this, authorViewHelper, activityViewHelper);
+        activitiesList.setAdapter(activitiesAdapter);
+
         activitiesList.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -104,20 +106,29 @@ public class ExploreActivity extends BaseActivity {
     @Background
     void fetchActivities() {
         List<Activity> activities = activityRepository.getAll();
-        activitiesAdapter = new ActivityCardAdapter(
-                activities,
-                this,
-                authorViewHelper,
-                activityViewHelper);
-
-        showActivities();
+        showActivities(activities);
     }
 
     @UiThread
-    void showActivities() {
-        activitiesList.setAdapter(activitiesAdapter);
-        loadingView.setVisibility(View.GONE);
-        activitiesList.setVisibility(View.VISIBLE);
+    void showActivities(List<Activity> activities) {
+        activitiesAdapter.replace(activities);
+
+        if (activitiesList.getVisibility() == View.GONE) {
+            loadingView.setVisibility(View.GONE);
+            activitiesList.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void onEventMainThread(ActivityEntityEvents.Posting e) {
+        fetchActivities();
+    }
+
+    public void onEventMainThread(ActivityEntityEvents.Posted e) {
+        fetchActivities();
+    }
+
+    public void onEventMainThread(UserEntityEvents.FetchedBatch e) {
+        fetchActivities();
     }
 
 

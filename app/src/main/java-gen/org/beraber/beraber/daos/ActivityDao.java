@@ -31,8 +31,9 @@ public class ActivityDao extends AbstractDao<Activity, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Title = new Property(1, String.class, "title", false, "TITLE");
         public final static Property Description = new Property(2, String.class, "description", false, "DESCRIPTION");
-        public final static Property Start_date = new Property(3, java.util.Date.class, "start_date", false, "START_DATE");
-        public final static Property User_id = new Property(4, long.class, "user_id", false, "USER_ID");
+        public final static Property Server_id = new Property(3, Long.class, "server_id", false, "SERVER_ID");
+        public final static Property Start_date = new Property(4, java.util.Date.class, "start_date", false, "START_DATE");
+        public final static Property User_id = new Property(5, long.class, "user_id", false, "USER_ID");
     };
 
     private DaoSession daoSession;
@@ -55,8 +56,9 @@ public class ActivityDao extends AbstractDao<Activity, Long> {
                 "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'TITLE' TEXT," + // 1: title
                 "'DESCRIPTION' TEXT," + // 2: description
-                "'START_DATE' INTEGER," + // 3: start_date
-                "'USER_ID' INTEGER NOT NULL );"); // 4: user_id
+                "'SERVER_ID' INTEGER," + // 3: server_id
+                "'START_DATE' INTEGER," + // 4: start_date
+                "'USER_ID' INTEGER NOT NULL );"); // 5: user_id
     }
 
     /** Drops the underlying database table. */
@@ -85,11 +87,16 @@ public class ActivityDao extends AbstractDao<Activity, Long> {
             stmt.bindString(3, description);
         }
  
+        Long server_id = entity.getServer_id();
+        if (server_id != null) {
+            stmt.bindLong(4, server_id);
+        }
+ 
         java.util.Date start_date = entity.getStart_date();
         if (start_date != null) {
-            stmt.bindLong(4, start_date.getTime());
+            stmt.bindLong(5, start_date.getTime());
         }
-        stmt.bindLong(5, entity.getUser_id());
+        stmt.bindLong(6, entity.getUser_id());
     }
 
     @Override
@@ -111,8 +118,9 @@ public class ActivityDao extends AbstractDao<Activity, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // title
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // description
-            cursor.isNull(offset + 3) ? null : new java.util.Date(cursor.getLong(offset + 3)), // start_date
-            cursor.getLong(offset + 4) // user_id
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // server_id
+            cursor.isNull(offset + 4) ? null : new java.util.Date(cursor.getLong(offset + 4)), // start_date
+            cursor.getLong(offset + 5) // user_id
         );
         return entity;
     }
@@ -123,8 +131,9 @@ public class ActivityDao extends AbstractDao<Activity, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setTitle(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setDescription(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setStart_date(cursor.isNull(offset + 3) ? null : new java.util.Date(cursor.getLong(offset + 3)));
-        entity.setUser_id(cursor.getLong(offset + 4));
+        entity.setServer_id(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setStart_date(cursor.isNull(offset + 4) ? null : new java.util.Date(cursor.getLong(offset + 4)));
+        entity.setUser_id(cursor.getLong(offset + 5));
      }
     
     /** @inheritdoc */

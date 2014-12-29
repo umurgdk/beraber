@@ -47,6 +47,11 @@ public class ActivityCardAdapter extends RecyclerView.Adapter<ActivityCardViewHo
         return activityList.get(position);
     }
 
+    public void replace(List<Activity> newList) {
+        activityList = newList;
+        notifyDataSetChanged();
+    }
+
     @Override
     public ActivityCardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_explore_item, parent, false);

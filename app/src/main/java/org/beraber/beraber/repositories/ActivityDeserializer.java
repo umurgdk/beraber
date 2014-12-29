@@ -21,10 +21,13 @@ public class ActivityDeserializer implements JsonDeserializer<Activity> {
                 .setDateFormat("yyyy-MM-dd")
                 .create();
 
-
-        Activity activity = gson.fromJson(json, Activity.class);
-
         JsonObject obj = json.getAsJsonObject();
+        long server_id = obj.get("id").getAsLong();
+        obj.remove("id");
+        obj.addProperty("server_id", server_id);
+
+        Activity activity = gson.fromJson(obj, Activity.class);
+
         if (obj.has("user")) {
             JsonObject objUser = obj.getAsJsonObject("user");
             User user = gson.fromJson(objUser, User.class);
