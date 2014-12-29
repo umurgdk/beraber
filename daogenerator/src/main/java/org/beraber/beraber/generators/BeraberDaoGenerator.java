@@ -13,14 +13,16 @@ public class BeraberDaoGenerator {
         activity.addIdProperty();
         activity.addStringProperty("title");
         activity.addStringProperty("description");
+        activity.addLongProperty("server_id");
         activity.addDateProperty("start_date");
 
         Property user_id = activity.addLongProperty("user_id").notNull().getProperty();
 
         Entity user = schema.addEntity("User");
-        user.addIdProperty();
+        user.addIdProperty().autoincrement();
         user.addStringProperty("name");
         user.addStringProperty("bio");
+        user.addLongProperty("server_id");
 
         activity.addToOne(user, user_id);
         user.addToMany(activity, user_id);
@@ -28,3 +30,4 @@ public class BeraberDaoGenerator {
         new DaoGenerator().generateAll(schema, args[0]);
     }
 }
+

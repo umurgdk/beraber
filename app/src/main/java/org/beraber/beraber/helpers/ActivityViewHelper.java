@@ -5,7 +5,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 
 import org.beraber.beraber.R;
-import org.beraber.beraber.entities.Activity;
+import org.beraber.beraber.daos.Activity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

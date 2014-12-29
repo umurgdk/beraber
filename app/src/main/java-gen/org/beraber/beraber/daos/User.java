@@ -13,6 +13,7 @@ public class User {
     private Long id;
     private String name;
     private String bio;
+    private Long server_id;
 
     /** Used to resolve relations */
     private transient DaoSession daoSession;
@@ -29,10 +30,11 @@ public class User {
         this.id = id;
     }
 
-    public User(Long id, String name, String bio) {
+    public User(Long id, String name, String bio, Long server_id) {
         this.id = id;
         this.name = name;
         this.bio = bio;
+        this.server_id = server_id;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -63,6 +65,14 @@ public class User {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public Long getServer_id() {
+        return server_id;
+    }
+
+    public void setServer_id(Long server_id) {
+        this.server_id = server_id;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

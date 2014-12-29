@@ -1,6 +1,5 @@
 package org.beraber.beraber.activities;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -11,9 +10,10 @@ import android.widget.TextView;
 
 import org.androidannotations.annotations.EActivity;
 import org.beraber.beraber.R;
-import org.beraber.beraber.entities.Activity;
+import org.beraber.beraber.daos.Activity;
 import org.beraber.beraber.helpers.ActivityViewHelper;
 import org.beraber.beraber.helpers.AuthorViewHelper;
+import org.beraber.beraber.repositories.ActivityRepository;
 
 import javax.inject.Inject;
 
@@ -22,13 +22,16 @@ import butterknife.InjectView;
 
 @EActivity
 public class ActivityDetailActivity extends BaseActivity {
-    public static final String EXTRA_ACTIVITY_DATA = "EXTRA_ACTIVITY_DATA";
+    public static final String EXTRA_ACTIVITY_ID = "EXTRA_ACTIVITY_ID";
 
     @Inject
     AuthorViewHelper authorViewHelper;
 
     @Inject
     ActivityViewHelper activityViewHelper;
+
+    @Inject
+    ActivityRepository activityRepository;
 
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -76,18 +79,19 @@ public class ActivityDetailActivity extends BaseActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            activityData = (Activity) extras.getParcelable(EXTRA_ACTIVITY_DATA);
+            long activityId = extras.getLong(EXTRA_ACTIVITY_ID);
+            activityData = activityRepository.getById(activityId);
             fillUI();
         }
     }
 
     private void fillUI() {
-        activityTitle.setText(activityData.title);
-        activityDescription.setText(activityData.description);
-        authorName.setText(activityData.user.name);
-        authorBio.setText(activityData.user.bio);
-        authorAvatar.setImageDrawable(authorViewHelper.getAvatarDrawable(this, activityData.user));
-        activityDate.setText(activityViewHelper.formatDate(activityData.startDate));
+        activityTitle.setText(activityData.getTitle());
+        activityDescription.setText(activityData.getDescription());
+        authorName.setText(activityData.getUser().getName());
+        authorBio.setText(activityData.getUser().getBio());
+        authorAvatar.setImageDrawable(authorViewHelper.getAvatarDrawable(this, activityData.getUser()));
+        activityDate.setText(activityViewHelper.formatDate(activityData.getStart_date()));
     }
 
 

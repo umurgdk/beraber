@@ -20,17 +20,21 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.beraber.beraber.R;
 import org.beraber.beraber.adapters.ActivityCardAdapter;
-import org.beraber.beraber.entities.Activity;
+import org.beraber.beraber.daos.Activity;
+import org.beraber.beraber.events.ActivityEntityEvents;
+import org.beraber.beraber.events.UserEntityEvents;
 import org.beraber.beraber.helpers.ActivityViewHelper;
 import org.beraber.beraber.helpers.AuthorViewHelper;
-import org.beraber.beraber.services.ActivitiesApiService;
+import org.beraber.beraber.repositories.ActivityRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import de.greenrobot.event.EventBus;
 
 @EActivity
 public class ExploreActivity extends BaseActivity {
@@ -47,7 +51,7 @@ public class ExploreActivity extends BaseActivity {
     FloatingActionButton fab;
 
     @Inject
-    ActivitiesApiService activitiesService;
+    ActivityRepository activityRepository;
 
     @Inject
     AuthorViewHelper authorViewHelper;
@@ -70,15 +74,20 @@ public class ExploreActivity extends BaseActivity {
         fab.setImageDrawable(new IconDrawable(this, Iconify.IconValue.md_add).sizeDp(24).color(Color.WHITE));
         fab.attachToRecyclerView(activitiesList);
 
+        EventBus.getDefault().register(this);
+
         prepareActivities();
     }
 
     private void openActivityDetailIntent(Activity activity) {
         Intent intent = new Intent(this, ActivityDetailActivity.class);
-        intent.putExtra(ActivityDetailActivity.EXTRA_ACTIVITY_DATA, activity);
+        intent.putExtra(ActivityDetailActivity.EXTRA_ACTIVITY_ID, activity.getId());
     }
 
     private void prepareActivities() {
+        activitiesAdapter = new ActivityCardAdapter(new ArrayList<Activity>(), this, authorViewHelper, activityViewHelper);
+        activitiesList.setAdapter(activitiesAdapter);
+
         activitiesList.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -96,21 +105,30 @@ public class ExploreActivity extends BaseActivity {
 
     @Background
     void fetchActivities() {
-        List<Activity> activities = activitiesService.listActivities();
-        activitiesAdapter = new ActivityCardAdapter(
-                activities,
-                this,
-                authorViewHelper,
-                activityViewHelper);
-
-        showActivities();
+        List<Activity> activities = activityRepository.getAll();
+        showActivities(activities);
     }
 
     @UiThread
-    void showActivities() {
-        activitiesList.setAdapter(activitiesAdapter);
-        loadingView.setVisibility(View.GONE);
-        activitiesList.setVisibility(View.VISIBLE);
+    void showActivities(List<Activity> activities) {
+        activitiesAdapter.replace(activities);
+
+        if (activitiesList.getVisibility() == View.GONE) {
+            loadingView.setVisibility(View.GONE);
+            activitiesList.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void onEventMainThread(ActivityEntityEvents.Posting e) {
+        fetchActivities();
+    }
+
+    public void onEventMainThread(ActivityEntityEvents.Posted e) {
+        fetchActivities();
+    }
+
+    public void onEventMainThread(UserEntityEvents.FetchedBatch e) {
+        fetchActivities();
     }
 
 

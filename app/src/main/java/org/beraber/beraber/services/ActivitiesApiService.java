@@ -1,6 +1,6 @@
 package org.beraber.beraber.services;
 
-import org.beraber.beraber.entities.Activity;
+import org.beraber.beraber.daos.Activity;
 
 import java.util.List;
 

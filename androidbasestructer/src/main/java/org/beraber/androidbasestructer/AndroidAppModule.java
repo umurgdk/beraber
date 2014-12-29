@@ -13,7 +13,7 @@ import dagger.Provides;
         library = true
 )
 public class AndroidAppModule {
-    /* package */ static Context applicationContext;
+    public static Context applicationContext;
 
     @Provides
     @Singleton

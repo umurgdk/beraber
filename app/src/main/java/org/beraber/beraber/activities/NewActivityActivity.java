@@ -2,7 +2,6 @@ package org.beraber.beraber.activities;
 
 import android.app.DatePickerDialog;
 import android.graphics.Color;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
@@ -12,18 +11,17 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
+import com.path.android.jobqueue.JobManager;
 
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.SystemService;
-import org.androidannotations.annotations.UiThread;
 import org.beraber.beraber.R;
-import org.beraber.beraber.entities.Activity;
-import org.beraber.beraber.entities.User;
+import org.beraber.beraber.helpers.entities.ActivityEntityHelper;
+import org.beraber.beraber.jobs.CreateActivityJob;
+import org.beraber.beraber.repositories.ActivityRepository;
 import org.beraber.beraber.services.ActivitiesApiService;
 
 import java.text.SimpleDateFormat;
@@ -55,7 +53,16 @@ implements DatePickerDialog.OnDateSetListener
     InputMethodManager im;
 
     @Inject
+    JobManager jobManager;
+
+    @Inject
+    ActivityRepository activityRepository;
+
+    @Inject
     ActivitiesApiService activitiesApiService;
+
+    @Inject
+    ActivityEntityHelper activityEntityHelper;
 
     DatePickerDialog datePicker;
     Date selectedDate;
@@ -90,21 +97,12 @@ implements DatePickerDialog.OnDateSetListener
     }
 
     public void createActivity() {
-        User user = new User("Umur Gedik", "hebelek", 1);
-        Activity activity = new Activity(title.getText().toString(), description.getText().toString(), user, 0, selectedDate, null, 0);
+        String title_ = title.getText().toString();
+        String description_ = description.getText().toString();
+        long user_id = 1;
+        Date start_date = selectedDate;
 
-        saveActivity(activity);
-    }
-
-    @Background
-    void saveActivity(Activity activity) {
-        activitiesApiService.createActivity(activity);
-
-        onActivitySaved();
-    }
-
-    @UiThread
-    void onActivitySaved() {
+        jobManager.addJobInBackground(new CreateActivityJob(title_, description_, user_id, start_date));
         finish();
     }
 
